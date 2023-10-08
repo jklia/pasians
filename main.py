@@ -46,8 +46,8 @@ win_width = 1300
 win_height = 700
 window = display.set_mode((win_width, win_height))
 # display.set_caption("Maze")
-# background = transform.scale(image.load("bosh.png"), (win_width, win_height))
-window.fill((200, 255, 255))
+background = transform.scale(image.load("poker.png"), (win_width, win_height+ 450))
+#window.fill((200, 255, 255))
 
 image1 = transform.scale(image.load('card_back.png'), (90, 120))
 window.blit(image1, (800, 200))
@@ -96,11 +96,13 @@ FPS = 60
 # lose_2 = font.render('PLAYER2 LOSE!', True, (180, 0, 0))
 
 k = 0
+m_field = []
 started = False
 active = None
 while game:
 
-    window.fill((200, 255, 255))
+    #window.fill((200, 255, 255))
+    window.blit(background, (0, -200))
     column[k].change(1)
     for card in column:
         card.reset()
@@ -136,9 +138,16 @@ while game:
         if e.type == MOUSEMOTION:
             xm, ym = e.pos
             if active is not None:
-                print("aaaaaa")
-                cards[active].rect.centerx = xm
-                cards[active].rect.centery = ym
+                for i in range(7):
+                    if cards[active] in field[i]:
+                        active_f = field[i].index(cards[active])
+                        m_field = field[i][active_f:]
+                        for j in range(len(m_field)):
+                            m_field[j].rect.centerx = xm
+                            m_field[j].rect.centery = ym + j*70
+                else:
+                    cards[active].rect.centerx = xm
+                    cards[active].rect.centery = ym
 
         if e.type == MOUSEBUTTONUP:
             if e.button == 3:
