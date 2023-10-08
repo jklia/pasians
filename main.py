@@ -16,9 +16,11 @@ pictures = [
 # класс-родитель для спрайтов
 class Card(sprite.Sprite):
     # конструктор класса
-    def __init__(self, x_co, y_co, width, height, opened, front, back, kind, numb):
+    def __init__(self, x_co, y_co, width, height, opened, front, back, kind, numb, coloring):
         super().__init__()
         # каждый спрайт должен хранить свойство image - изображение
+        self.coloring = coloring
+        self.opened = opened
         self.kind = kind
         self.numb = numb
         self.front = front
@@ -35,6 +37,7 @@ class Card(sprite.Sprite):
             self.image = transform.scale(image.load(self.front), (self.width, self.height))
         elif opened == 2:
             self.image = transform.scale(image.load(self.back), (self.width, self.height))
+
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -42,11 +45,13 @@ class Card(sprite.Sprite):
         return self.rect.collidepoint(x, y)
 
 
+
+
 win_width = 1300
 win_height = 700
 window = display.set_mode((win_width, win_height))
 # display.set_caption("Maze")
-background = transform.scale(image.load("poker.png"), (win_width, win_height+ 450))
+background = transform.scale(image.load("poker.png"), (win_width, win_height + 600))
 #window.fill((200, 255, 255))
 
 image1 = transform.scale(image.load('card_back.png'), (90, 120))
@@ -65,8 +70,12 @@ field = [
 cards = []
 for i in range(4):
     for j in range(13):
-        card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j+1)
-        cards.append(card)
+        if i < 2:
+            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j+1, 'R')
+            cards.append(card)
+        else:
+            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j + 1, 'B')
+            cards.append(card)
 
 random.shuffle(cards)
 column = cards.copy()
@@ -102,7 +111,7 @@ active = None
 while game:
 
     #window.fill((200, 255, 255))
-    window.blit(background, (0, -200))
+    window.blit(background, (0, -300))
     column[k].change(1)
     for card in column:
         card.reset()
@@ -152,6 +161,14 @@ while game:
         if e.type == MOUSEBUTTONUP:
             if e.button == 3:
                 active = None
+                if len(m_field) > 0:
+                    for card in cards:
+                        if card.rect.colliderect(m_field[0]) and card not in m_field and card not in column:
+                            for i in range(7):
+                                if card in field[i]:
+                                    field[i] += m_field
+
+
     #window.fill((200, 255, 255))
     # column[k].reset()
     # for i in range(7):
@@ -160,3 +177,10 @@ while game:
     window.blit(image1, (800, 200))
     display.update()
     clock.tick(FPS)
+
+
+
+
+
+
+
