@@ -13,12 +13,9 @@ pictures = [
     ]
 
 
-# класс-родитель для спрайтов
 class Card(sprite.Sprite):
-    # конструктор класса
     def __init__(self, x_co, y_co, width, height, opened, front, back, kind, numb, coloring):
         super().__init__()
-        # каждый спрайт должен хранить свойство image - изображение
         self.coloring = coloring
         self.opened = opened
         self.kind = kind
@@ -28,11 +25,11 @@ class Card(sprite.Sprite):
         self.width = width
         self.height = height
         self.image = transform.scale(image.load(back), (width, height))
-        # каждый спрайт должен хранить свойство rect - прямоугольник, в который он вписан
         self.rect = self.image.get_rect()
         self.rect.x = x_co
         self.rect.y = y_co
-    def change (self, opened):
+
+    def change(self, opened):       #переворот карты
         if opened == 1:
             self.image = transform.scale(image.load(self.front), (self.width, self.height))
         elif opened == 2:
@@ -45,14 +42,10 @@ class Card(sprite.Sprite):
         return self.rect.collidepoint(x, y)
 
 
-
-
 win_width = 1300
 win_height = 700
 window = display.set_mode((win_width, win_height))
-# display.set_caption("Maze")
 background = transform.scale(image.load("poker.png"), (win_width, win_height + 600))
-#window.fill((200, 255, 255))
 
 image1 = transform.scale(image.load('card_back.png'), (90, 120))
 window.blit(image1, (800, 200))
@@ -71,77 +64,80 @@ cards = []
 for i in range(4):
     for j in range(13):
         if i < 2:
-            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j+1, 'R')
+            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j+2, 'R')
             cards.append(card)
         else:
-            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j + 1, 'B')
+            card = Card(800, 200, 90, 120, 2, pictures[i][j], 'card_back.png', kinds[i], j+2, 'B')
             cards.append(card)
+
+for card in cards:
+    print(card.numb)
 
 random.shuffle(cards)
 column = cards.copy()
 column1 = []
-#lying_cards = []
+
 k = 0
 for i in range(7):
     for j in range(i + 1):
-        print(k)
         cards[k].rect.x = i * 100
         cards[k].rect.y = j * 70
-        cards[k].change(1)
+        if j == i:
+            cards[k].change(1)
         field[i].append(cards[k])
-        #lying_cards.append(cards[j])
         column.pop(0)
         k += 1
-for card in cards:
-    print(card.rect.x, card.rect.y)
+
 game = True
 finish = False
 clock = time.Clock()
 FPS = 60
 
-# font.init()
-# font = font.SysFont("Arial", 70)
-# lose_1 = font.render('PLAYER1 LOSE!', True, (180, 0, 0))
-# lose_2 = font.render('PLAYER2 LOSE!', True, (180, 0, 0))
-
-k = 0
+cur = 0
+z = 0
 m_field = []
+del_i = None
+del_active_f = None
 started = False
 active = None
+
 while game:
 
-    #window.fill((200, 255, 255))
     window.blit(background, (0, -300))
-    column[k].change(1)
+
+    column[cur].change(1)
     for card in column:
         card.reset()
+
     for i in range(7):
         for card in (field[i]):
             card.reset()
+
     for e in event.get():
+
         if e.type == QUIT:
             game = False
+
         if e.type == MOUSEBUTTONDOWN:
+
             if e.button == 1:
-                print("eeeee")
                 xm, ym = e.pos
                 if 800 < xm < 890 and 200 < ym < 320:
-                    if k < 23:
-                        k += 1
-                    elif k == 23:
-                        k = 0
-                if column[k].rect.x < 900:
-                    column[k].rect.x = column[k].rect.x + 100
+                    if cur < 23:
+                        cur += 1
+                    elif cur == 23:
+                        cur = 0
+                if column[cur].rect.x < 900:
+                    column[cur].rect.x = column[cur].rect.x + 100
                 else:
                     for card in column:
                         card.rect.x = 800
+                    column[cur].rect.x = column[cur].rect.x + 100
 
             if e.button == 3:
-                print("sssssss")
                 xm, ym = e.pos
                 for card in cards:
                     if card.inside(xm, ym):
-                        print("vvvvvv")
                         active = cards.index(card)
 
         if e.type == MOUSEMOTION:
@@ -149,31 +145,57 @@ while game:
             if active is not None:
                 for i in range(7):
                     if cards[active] in field[i]:
+                        z = 1
                         active_f = field[i].index(cards[active])
-                        m_field = field[i][active_f:]
+                        m_field = field[i][active_f:].copy()
+                        del_i = i
+                        del_active_f = active_f
                         for j in range(len(m_field)):
                             m_field[j].rect.centerx = xm
                             m_field[j].rect.centery = ym + j*70
+                        break
                 else:
-                    cards[active].rect.centerx = xm
-                    cards[active].rect.centery = ym
+                    if cards[active] == column[cur]:
+                        cards[active].rect.centerx = xm
+                        cards[active].rect.centery = ym
+                        m_field = column[cur]
+                        z = 2
 
         if e.type == MOUSEBUTTONUP:
             if e.button == 3:
-                active = None
-                if len(m_field) > 0:
+                if z == 1:
+                    print("a")
+                    cards[active - 1].change(1)
+                    z = 0
                     for card in cards:
-                        if card.rect.colliderect(m_field[0]) and card not in m_field and card not in column:
+                        if card.rect.colliderect(m_field[0]) and card not in m_field and card not in column and card.numb - 1 == m_field[0].numb and card.numb != 14 and card.coloring != m_field[0].coloring:
                             for i in range(7):
                                 if card in field[i]:
-                                    field[i] += m_field
+                                    print('b')
+                                    m_field[0].rect.x = field[i][-1].rect.x
+                                    m_field[0].rect.y = field[i][-1].rect.y + 70
+                                    for j in range(1, len(m_field)):
+                                        m_field[j].rect.x = m_field[j-1].rect.x
+                                        m_field[j].rect.y = m_field[j-1].rect.y + 70
+                                        field[i] = field[i] + m_field
+                                        del field[del_i][del_active_f:]
+                                    break
+                            break
+                elif z == 2:
+                    z = 0
+                    for card in cards:
+                        if card.rect.colliderect(m_field) and card not in column and card.numb - 1 == m_field.numb and card.numb != 14 and card.coloring != m_field.coloring:
+                            for i in range(7):
+                                if card in field[i]:
+                                    m_field.rect.x = field[i][-1].rect.x
+                                    m_field.rect.y = field[i][-1].rect.y + 70
+                                    field[i].append(m_field)
+                                    del field[del_i][del_active_f]
+                                    break
+                            break
+            active = None
 
 
-    #window.fill((200, 255, 255))
-    # column[k].reset()
-    # for i in range(7):
-    #     for card in (field[i]):
-    #         card.reset()
     window.blit(image1, (800, 200))
     display.update()
     clock.tick(FPS)
