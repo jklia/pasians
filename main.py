@@ -132,6 +132,7 @@ while game:
                 else:
                     for card in column:
                         card.rect.x = 800
+                        card.rect.y = 200
                     column[cur].rect.x = column[cur].rect.x + 100
 
             if e.button == 3:
