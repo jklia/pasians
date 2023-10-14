@@ -12,6 +12,10 @@ pictures = [
     ['2_of_spades.png', '3_of_spades.png', '4_of_spades.png', '5_of_spades.png', '6_of_spades.png', '7_of_spades.png', '8_of_spades.png', '9_of_spades.png', '10_of_spades.png', 'jack_of_spades.png', 'queen_of_spades.png', 'king_of_spades.png', 'ace_of_spades.png']
     ]
 
+extra_pig = ['ace_of_hearts (1).png', 'ace_of_clubs (1).png', 'ace_of_diamonds (1).png', 'ace_of_spades (2).png']
+extra_kids = ['ch', 'kr', 'bu', 'pi']
+
+check = [[15, 14], [14, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12], [12, 13]]
 
 class Card(sprite.Sprite):
     def __init__(self, x_co, y_co, width, height, opened, front, back, kind, numb, coloring):
@@ -49,6 +53,21 @@ background = transform.scale(image.load("poker.png"), (win_width, win_height + 6
 
 image1 = transform.scale(image.load('card_back.png'), (90, 120))
 window.blit(image1, (800, 200))
+
+
+extra_car = [
+    [],
+    [],
+    [],
+    [],
+]
+for i in range(4):
+    if i % 2 == 0:
+        card = Card(800 + i*100, 50, 90, 120, 1, extra_pig[i], 'card_back.png', extra_kids[i], 15, 'R')
+    else:
+        card = Card(800 + i * 100, 50, 90, 120, 1, extra_pig[i], 'card_back.png', extra_kids[i], 15, 'B')
+    card.change(1)
+    extra_car[i].append(card)
 
 field = [
     [],
@@ -103,15 +122,18 @@ active = None
 
 while game:
 
-    window.blit(background, (0, -300))
-
-    column[cur].change(1)
-    for card in column:
-        card.reset()
-
-    for i in range(7):
-        for card in (field[i]):
-            card.reset()
+    # window.blit(background, (0, -300))
+    # for i in extra_car:
+    #     for card in i:
+    #         card.reset()
+    #
+    # column[cur].change(1)
+    # for card in column:
+    #     card.reset()
+    #
+    # for i in range(7):
+    #     for card in (field[i]):
+    #         card.reset()
 
     for e in event.get():
 
@@ -123,9 +145,9 @@ while game:
             if e.button == 1:
                 xm, ym = e.pos
                 if 800 < xm < 890 and 200 < ym < 320:
-                    if cur < 23:
+                    if cur < len(column) - 1:
                         cur += 1
-                    elif cur == 23:
+                    elif cur == len(column) - 1:
                         cur = 0
                 if column[cur].rect.x < 900:
                     column[cur].rect.x = column[cur].rect.x + 100
@@ -159,7 +181,8 @@ while game:
                     if cards[active] == column[cur]:
                         cards[active].rect.centerx = xm
                         cards[active].rect.centery = ym
-                        m_field = column[cur]
+                        m_field = [0]
+                        m_field[0] = column[cur]
                         z = 2
 
         if e.type == MOUSEBUTTONUP:
@@ -182,28 +205,66 @@ while game:
                                         del field[del_i][del_active_f:]
                                     break
                             break
+                    for i in range(4):
+                        if len(m_field) == 1:
+                            print('какиш')
+                            if extra_car[i][-1].rect.colliderect(m_field[0]) and extra_car[i][-1].kind == m_field[0].kind and [extra_car[i][-1].numb,  m_field[0].numb] in check:
+                                m_field[0].rect.x = extra_car[i][-1].rect.x
+                                m_field[0].rect.y = extra_car[i][-1].rect.y
+                                extra_car[i].append(m_field.pop(0))
+
                 elif z == 2:
                     z = 0
                     for card in cards:
-                        if card.rect.colliderect(m_field) and card not in column and card.numb - 1 == m_field.numb and card.numb != 14 and card.coloring != m_field.coloring:
+                        if card.rect.colliderect(m_field[0]) and card not in column and card.numb - 1 == m_field[0].numb and card.numb != 14 and card.coloring != m_field[0].coloring:
                             for i in range(7):
                                 if card in field[i]:
-                                    m_field.rect.x = field[i][-1].rect.x
-                                    m_field.rect.y = field[i][-1].rect.y + 70
-                                    field[i].append(m_field)
-                                    del field[del_i][del_active_f]
+                                    m_field[0].rect.x = field[i][-1].rect.x
+                                    m_field[0].rect.y = field[i][-1].rect.y + 70
+                                    field[i].append(m_field[0])
+                                    del column[cur]
+                                    cur -= 1
+                                    #del field[del_i][del_active_f]
                                     break
                             break
+                    for i in range(4):
+                        if len(m_field) == 1:
+                            print('какиш2')
+                            if extra_car[i][-1].rect.colliderect(m_field[0]) and extra_car[i][-1].kind == m_field[0].kind and [extra_car[i][-1].numb,  m_field[0].numb] in check:
+                                print('какиш3')
+                                m_field[0].rect.x = extra_car[i][-1].rect.x
+                                m_field[0].rect.y = extra_car[i][-1].rect.y
+                                extra_car[i].append(m_field.pop(0))
+                                del column[cur]
+                                cur -= 1
+
+                    # for card in extra_car:
+                    #     if len(m_field) == 1:
+                    #         print('какиш2')
+                    #         if card.rect.colliderect(m_field[0]) and card.numb - 1 == m_field[0].numb and card.kind == m_field[0].kind:
+                    #             print('какиш3')
+                    #             m_field[0].rect.x = card.rect.x
+                    #             m_field[0].rect.y = card.rect.y
+                    #             card = m_field.pop(0)
+                    #             del column[cur]
+                    #             card.reset()
+
             active = None
 
+    window.blit(background, (0, -300))
+    for i in extra_car:
+        for card in i:
+            card.reset()
+
+    column[cur].change(1)
+    for card in column:
+        card.reset()
+
+    for i in range(7):
+        for card in (field[i]):
+            card.reset()
 
     window.blit(image1, (800, 200))
+
     display.update()
     clock.tick(FPS)
-
-
-
-
-
-
-
