@@ -133,7 +133,7 @@ for i in range(7):
     field[i].append(card1)
     for j in range(i + 1):
         cards[k].rect.x = i * 100
-        cards[k].rect.y = j * 70
+        cards[k].rect.y = j * 40
         if j == i:
             cards[k].change(1)
             possible.append(cards[k])
@@ -220,7 +220,7 @@ while game:
                                 del_active_f = line
                                 for j in range(len(m_field)):
                                     m_field[j].rect.centerx = xm
-                                    m_field[j].rect.centery = ym + j*70
+                                    m_field[j].rect.centery = ym + j*40
                                 break
                             else:
                                 print('ooo')
@@ -233,7 +233,7 @@ while game:
                                         del_active_f = line
                                         for j in range(len(m_field)):
                                             m_field[j].rect.centerx = xm
-                                            m_field[j].rect.centery = ym + j*70
+                                            m_field[j].rect.centery = ym + j*40
                                         break
 
                 else:
@@ -269,10 +269,10 @@ while game:
                                 if card in field[i]:
                                     print('mmm')
                                     m_field[0].rect.x = field[i][-1].rect.x
-                                    m_field[0].rect.y = field[i][-1].rect.y + 70
+                                    m_field[0].rect.y = field[i][-1].rect.y + 40
                                     for j in range(1, len(m_field)):
                                         m_field[j].rect.x = m_field[j-1].rect.x
-                                        m_field[j].rect.y = m_field[j-1].rect.y + 70
+                                        m_field[j].rect.y = m_field[j-1].rect.y + 40
                                     field[i] = field[i] + m_field
                                     cards[active - 1].change(1)
                                     print(possible[i].numb)
@@ -308,7 +308,7 @@ while game:
                                 for i in range(7):
                                     if card in field[i]:
                                         m_field[0].rect.x = field[i][-1].rect.x
-                                        m_field[0].rect.y = field[i][-1].rect.y + 70
+                                        m_field[0].rect.y = field[i][-1].rect.y + 40
                                         field[i].append(m_field[0])
                                         possible[i] = m_field[-1]
                                         del column[cur]
@@ -348,7 +348,7 @@ while game:
                                 m_field[0].rect.y = field[i][0].rect.y
                                 for j in range(1, len(m_field)):
                                     m_field[j].rect.x = m_field[j - 1].rect.x
-                                    m_field[j].rect.y = m_field[j - 1].rect.y + 70
+                                    m_field[j].rect.y = m_field[j - 1].rect.y + 40
                                 field[i] = field[i] + m_field
                                 cards[active - 1].change(1)
                                 possible[i] = m_field[-1]
