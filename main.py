@@ -214,7 +214,6 @@ while game:
                         if field[i][line].posi(check_posi) or field[i][line].extr_posi(extra_car, check):
                             if field[i][line].numb != 13:
                                 print('tttt')
-                                print('bbb')
                                 z = 1
                                 m_field = field[i][line:].copy()
                                 del_i = i
@@ -227,22 +226,22 @@ while game:
                                 print('ooo')
                                 for s in range(7):
                                     if len(field[s]) == 1:
+                                        print('ne cto')
                                         z = 3
+                                        m_field = field[i][line:].copy()
                                         del_i = i
                                         del_active_f = line
-                                        m_field = field[i][line:].copy()
                                         for j in range(len(m_field)):
                                             m_field[j].rect.centerx = xm
                                             m_field[j].rect.centery = ym + j*70
+                                        break
 
                 else:
                     if cards[active] == column[cur]:
-                        print('gggg')
-                        print(column[cur].numb)
                         if column[cur].posi(check_posi) or column[cur].extr_posi(extra_car, check):
-                            print('gjjj')
+                            print('pppp')
                             if column[cur].numb != 13:
-                                print('kkk')
+                                print('wwww')
                                 cards[active].rect.centerx = xm
                                 cards[active].rect.centery = ym
                                 m_field = [0]
@@ -262,20 +261,22 @@ while game:
         if e.type == MOUSEBUTTONUP:
             if e.button == 3:
                 if z == 1:
-                    cards[active - 1].change(1)
+                    #cards[active - 1].change(1)
                     z = 0
                     for card in cards:
                         if card.rect.colliderect(m_field[0]) and card not in m_field and card not in column and card.numb - 1 == m_field[0].numb and card.numb != 14 and card.coloring != m_field[0].coloring:
                             for i in range(7):
                                 if card in field[i]:
+                                    print('mmm')
                                     m_field[0].rect.x = field[i][-1].rect.x
                                     m_field[0].rect.y = field[i][-1].rect.y + 70
                                     for j in range(1, len(m_field)):
                                         m_field[j].rect.x = m_field[j-1].rect.x
                                         m_field[j].rect.y = m_field[j-1].rect.y + 70
                                     field[i] = field[i] + m_field
+                                    cards[active - 1].change(1)
                                     print(possible[i].numb)
-                                    possible[i] = field[i][-1]
+                                    possible[i] = m_field[-1]
                                     print(possible[i].numb)
                                     print(possible[del_i].numb)
                                     possible[del_i] = field[del_i][del_active_f - 1]
@@ -289,6 +290,7 @@ while game:
                                 m_field[0].rect.x = extra_car[i][-1].rect.x
                                 m_field[0].rect.y = extra_car[i][-1].rect.y
                                 extra_car[i].append(m_field.pop(0))
+                                cards[active - 1].change(1)
                                 del field[del_i][del_active_f:]
                                 if len(field[del_i]) > 0:
                                     print(possible[del_i].numb)
@@ -308,9 +310,7 @@ while game:
                                         m_field[0].rect.x = field[i][-1].rect.x
                                         m_field[0].rect.y = field[i][-1].rect.y + 70
                                         field[i].append(m_field[0])
-                                        print(possible[i].numb)
                                         possible[i] = m_field[-1]
-                                        print(possible[i].numb)
                                         del column[cur]
                                         cur -= 1
                                         #del field[del_i][del_active_f]
@@ -321,6 +321,7 @@ while game:
                         for i in range(7):
                             if len(field[i]) == 1:
                                 if field[i][0].inside(m_field[0]):
+                                    m = 0
                                     m_field[0].rect.x = field[i][-1].rect.x
                                     m_field[0].rect.y = field[i][-1].rect.y
                                     field[i].append(m_field[0])
@@ -336,19 +337,24 @@ while game:
                                 del column[cur]
                                 cur -= 1
                 elif z == 3:
-                    cards[active - 1].change(1)
+                    print('eeee')
+                    #cards[active - 1].change(1)
                     for i in range(7):
-                        if len(field[i]) == 1:
+                        if field[i][-1].numb == 1:  #len(field[i]) == 1
+                            print('yyyyy')
                             if field[i][0].inside(m_field[0]):
+                                print("uuuuu")
                                 m_field[0].rect.x = field[i][0].rect.x
                                 m_field[0].rect.y = field[i][0].rect.y
                                 for j in range(1, len(m_field)):
-                                    m_field[j].rect.x = m_field[j].rect.x
-                                    m_field[j].rect.y = m_field[j].rect.y + 70
+                                    m_field[j].rect.x = m_field[j - 1].rect.x
+                                    m_field[j].rect.y = m_field[j - 1].rect.y + 70
                                 field[i] = field[i] + m_field
-                            possible[i] = m_field[-1]
-                            possible[del_i] = field[del_i][del_active_f - 1]
-                            del field[del_i][del_active_f:]
+                                cards[active - 1].change(1)
+                                possible[i] = m_field[-1]
+                                possible[del_i] = field[del_i][del_active_f - 1]
+                                del field[del_i][del_active_f:]
+                                z = 0
                         break
 
                     # for card in extra_car:
